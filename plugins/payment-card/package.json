@@ -13,6 +13,7 @@
 		"@zaydemy/core": "workspace:*",
 		"@zaydemy/db": "workspace:*",
 		"@zaydemy/plugin-payments": "workspace:*",
+		"@zaydemy/ui": "workspace:*",
 		"better-payment": "^0.10.0",
 		"drizzle-orm": "^0.45.4"
 	},

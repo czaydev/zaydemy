@@ -15,6 +15,7 @@ export function discordFeedback({ webhookUrl, username, avatarUrl }: DiscordFeed
 		id: "feedback-discord",
 		name: "Feedback to Discord",
 		version: "0.1.0",
+		appNav: [{ label: "feedback.title", href: "/feedback", icon: "message" }],
 		messages,
 		pages: [
 			{ area: "app", path: "/feedback", signedIn: true, load: () => import("./pages/feedback") },

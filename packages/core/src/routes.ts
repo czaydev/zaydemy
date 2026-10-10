@@ -39,6 +39,11 @@ export interface PluginPage {
 	permission?: string;
 	/** App pages that need a signed-in user. */
 	signedIn?: boolean;
+	/**
+	 * `bare` renders the page without the site header and footer, for public
+	 * pages with their own look such as a link-in-bio page.
+	 */
+	layout?: "default" | "bare";
 }
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";

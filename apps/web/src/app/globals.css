@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@zaydemy/ui/styles.css";
+
+/* Class names used by the shared components and by plugin pages. */
+@source "../../../../packages/ui/src";
+@source "../../../../plugins";
+@source "../../../../ee";

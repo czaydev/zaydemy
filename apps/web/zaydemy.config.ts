@@ -17,6 +17,8 @@ export default defineConfig({
 		name: "Zaydemy",
 		slug: "zaydemy",
 		supportEmail: "support@example.com",
+		// logo: { full: "/logo.svg", icon: "/icon.svg" },
+		theme: { primary: "#2b59d9" },
 	},
 	locales: { default: "tr", supported: ["tr", "en"] },
 	plugins: [

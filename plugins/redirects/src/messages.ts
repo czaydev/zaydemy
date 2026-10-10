@@ -17,6 +17,9 @@ export default {
 			addCategory: "Kategori ekle",
 			none: "Kategorisiz",
 			all: "Tümü",
+			empty: "Bu görünümde yönlendirme yok.",
+			activate: "Etkinleştir",
+			deactivate: "Durdur",
 			invalid:
 				"Kısa ad yalnızca küçük harf, rakam ve tire içerebilir; hedef bir http(s) adresi olmalı.",
 		},
@@ -39,6 +42,9 @@ export default {
 			addCategory: "Add category",
 			none: "No category",
 			all: "All",
+			empty: "No redirects here.",
+			activate: "Activate",
+			deactivate: "Pause",
 			invalid:
 				"The slug may only contain lowercase letters, digits and dashes; the target must be an http(s) URL.",
 		},

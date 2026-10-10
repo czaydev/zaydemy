@@ -1,4 +1,16 @@
 import { type PluginPageProps, runtime } from "@zaydemy/core";
+import {
+	Button,
+	EmptyState,
+	Icon,
+	PageHeader,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@zaydemy/ui";
 import { waitingContracts } from "../service";
 
 /** Applications at the contract stage; staff can record a contract signed on paper. */
@@ -6,32 +18,42 @@ export default async function AdminContractsPage({ t }: PluginPageProps) {
 	const contracts = await waitingContracts(runtime().db);
 	return (
 		<main>
-			<h1>{t("contract.admin.title")}</h1>
-			{contracts.length === 0 ? <p>{t("contract.admin.empty")}</p> : null}
-			<table>
-				<thead>
-					<tr>
-						<th>{t("contract.admin.application")}</th>
-						<th>{t("contract.admin.applicant")}</th>
-						<th />
-					</tr>
-				</thead>
-				<tbody>
-					{contracts.map((contract) => (
-						<tr key={contract.id}>
-							<td>
-								{contract.reference} · {contract.course}
-							</td>
-							<td>{contract.applicant}</td>
-							<td>
-								<form method="post" action={`/api/admin/contract/${contract.id}/complete`}>
-									<button type="submit">{t("contract.admin.markSigned")}</button>
-								</form>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+			<PageHeader title={t("contract.admin.title")} />
+			{contracts.length === 0 ? (
+				<EmptyState icon={<Icon name="signature" />} title={t("contract.admin.empty")} />
+			) : (
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>{t("contract.admin.applicant")}</TableHead>
+							<TableHead>{t("contract.admin.application")}</TableHead>
+							<TableHead />
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{contracts.map((contract) => (
+							<TableRow key={contract.id}>
+								<TableCell className="font-medium">{contract.applicant}</TableCell>
+								<TableCell>
+									<p>{contract.course}</p>
+									<p className="font-mono text-muted-foreground text-xs">{contract.reference}</p>
+								</TableCell>
+								<TableCell>
+									<form
+										method="post"
+										action={`/api/admin/contract/${contract.id}/complete`}
+										className="flex justify-end"
+									>
+										<Button type="submit" size="sm" variant="outline">
+											{t("contract.admin.markSigned")}
+										</Button>
+									</form>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			)}
 		</main>
 	);
 }

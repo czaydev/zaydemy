@@ -32,6 +32,7 @@ export const contractPlugin = definePlugin({
 	adminNav: [
 		{ label: "contract.nav", href: "/admin/contracts", icon: "signature", permission: MANAGE },
 	],
+	appNav: [{ label: "contract.stage", href: "/contract", icon: "signature" }],
 	messages,
 	pages: [
 		{ area: "app", path: "/contract", signedIn: true, load: () => import("./pages/my-contract") },
