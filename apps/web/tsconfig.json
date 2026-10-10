@@ -1,0 +1,9 @@
+{
+	"extends": "@zaydemy/tsconfig/nextjs.json",
+	"compilerOptions": {
+		"types": ["node"],
+		"paths": { "@/*": ["./src/*"] }
+	},
+	"include": ["next-env.d.ts", "src", "test", "scripts", "*.ts", ".next/types/**/*.ts"],
+	"exclude": ["node_modules"]
+}

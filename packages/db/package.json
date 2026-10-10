@@ -1,0 +1,24 @@
+{
+	"name": "@zaydemy/db",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./schema": "./src/schema/index.ts",
+		"./pipeline-store": "./src/pipeline-store.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc"
+	},
+	"dependencies": {
+		"drizzle-orm": "^0.45.4",
+		"pg": "^8.16.3",
+		"@zaydemy/core": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/pg": "^8.15.6",
+		"@zaydemy/tsconfig": "workspace:*",
+		"typescript": "^5.9.3"
+	}
+}

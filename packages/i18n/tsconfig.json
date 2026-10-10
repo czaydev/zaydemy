@@ -1,0 +1,7 @@
+{
+	"extends": "@zaydemy/tsconfig/base.json",
+	"include": ["src", "test"],
+	"compilerOptions": {
+		"types": ["node"]
+	}
+}

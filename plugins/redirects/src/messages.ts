@@ -1,0 +1,46 @@
+export default {
+	tr: {
+		redirects: {
+			nav: "Yönlendirmeler",
+			redirecting: "Yönlendiriliyorsunuz…",
+			continue: "Devam et",
+			notFound: "Bu bağlantı bulunamadı veya artık geçerli değil.",
+			name: "Ad",
+			slug: "Kısa ad",
+			target: "Hedef adres",
+			description: "Açıklama",
+			countdown: "Bekleme (sn)",
+			category: "Kategori",
+			clicks: "Tıklanma",
+			active: "Aktif",
+			add: "Yönlendirme ekle",
+			addCategory: "Kategori ekle",
+			none: "Kategorisiz",
+			all: "Tümü",
+			invalid:
+				"Kısa ad yalnızca küçük harf, rakam ve tire içerebilir; hedef bir http(s) adresi olmalı.",
+		},
+	},
+	en: {
+		redirects: {
+			nav: "Redirects",
+			redirecting: "Redirecting…",
+			continue: "Continue",
+			notFound: "This link does not exist or is no longer active.",
+			name: "Name",
+			slug: "Slug",
+			target: "Target URL",
+			description: "Description",
+			countdown: "Delay (s)",
+			category: "Category",
+			clicks: "Clicks",
+			active: "Active",
+			add: "Add redirect",
+			addCategory: "Add category",
+			none: "No category",
+			all: "All",
+			invalid:
+				"The slug may only contain lowercase letters, digits and dashes; the target must be an http(s) URL.",
+		},
+	},
+};

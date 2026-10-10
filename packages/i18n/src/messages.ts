@@ -1,0 +1,91 @@
+import type { Locale, Messages } from "@zaydemy/core";
+
+/** Strings owned by the core app shell. Plugins bring their own under their id. */
+export const coreMessages: Record<Locale, Messages> = {
+	tr: {
+		common: {
+			poweredBy: "{name} altyapısıyla",
+			enabledPlugins: "Etkin eklentiler",
+			notFound: "Sayfa bulunamadı",
+			home: "Ana sayfa",
+			admin: "Yönetim",
+			signIn: "Giriş yap",
+			signOut: "Çıkış yap",
+		},
+		auth: {
+			title: "Giriş yap",
+			signUpTitle: "Hesap oluştur",
+			name: "Ad soyad",
+			email: "E-posta",
+			password: "Şifre",
+			submit: "Devam et",
+			toSignUp: "Hesabın yok mu? Kayıt ol",
+			toSignIn: "Zaten hesabın var mı? Giriş yap",
+			failed: "Giriş yapılamadı. Bilgilerini kontrol et.",
+		},
+		home: {
+			welcome: "Hoş geldin, {name}",
+			signedOut: "Başvuru yapmak için giriş yap.",
+			myApplications: "Başvurularım",
+			noApplications: "Henüz başvurun yok.",
+			currentStage: "Sıradaki adım",
+			goToStage: "Devam et",
+			courses: "Açık eğitimler",
+			noCourses: "Şu anda açık eğitim yok.",
+			apply: "Başvur",
+			limitReached: "Aynı anda en fazla {limit} başvurun olabilir.",
+		},
+		adminHome: { title: "Yönetim paneli", empty: "Erişebileceğin bir bölüm yok." },
+		application: {
+			status: {
+				in_progress: "Devam ediyor",
+				enrolled: "Kayıt tamamlandı",
+				rejected: "Reddedildi",
+				withdrawn: "Geri çekildi",
+			},
+		},
+	},
+	en: {
+		common: {
+			poweredBy: "Powered by {name}",
+			enabledPlugins: "Enabled plugins",
+			notFound: "Page not found",
+			home: "Home",
+			admin: "Admin",
+			signIn: "Sign in",
+			signOut: "Sign out",
+		},
+		auth: {
+			title: "Sign in",
+			signUpTitle: "Create an account",
+			name: "Full name",
+			email: "E-mail",
+			password: "Password",
+			submit: "Continue",
+			toSignUp: "No account yet? Sign up",
+			toSignIn: "Already have an account? Sign in",
+			failed: "Could not sign in. Check your details.",
+		},
+		home: {
+			welcome: "Welcome, {name}",
+			signedOut: "Sign in to apply.",
+			myApplications: "My applications",
+			noApplications: "You have no applications yet.",
+			currentStage: "Next step",
+			goToStage: "Continue",
+			courses: "Open courses",
+			noCourses: "No course is open right now.",
+			apply: "Apply",
+			limitReached: "You can have at most {limit} open applications.",
+		},
+		adminHome: { title: "Admin panel", empty: "There is nothing here you can access." },
+		application: {
+			status: {
+				in_progress: "In progress",
+				enrolled: "Enrolled",
+				rejected: "Rejected",
+				withdrawn: "Withdrawn",
+			},
+		},
+	},
+};

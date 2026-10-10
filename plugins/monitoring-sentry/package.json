@@ -1,0 +1,21 @@
+{
+	"name": "@zaydemy/plugin-monitoring-sentry",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc"
+	},
+	"dependencies": {
+		"@zaydemy/core": "workspace:*",
+		"@sentry/node": "^10.35.0"
+	},
+	"devDependencies": {
+		"@types/node": "^22.19.0",
+		"@zaydemy/tsconfig": "workspace:*",
+		"typescript": "^5.9.3"
+	}
+}

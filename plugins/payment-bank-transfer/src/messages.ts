@@ -1,0 +1,44 @@
+export default {
+	tr: {
+		bankTransfer: {
+			label: "Havale / EFT",
+			nav: "Banka hesapları",
+			instructions:
+				"Tutarı aşağıdaki hesaplardan birine gönderin ve açıklamaya ödeme numaranızı ({reference}) yazın. Gönderdikten sonra bize bildirin.",
+			bank: "Banka",
+			branch: "Şube",
+			holder: "Hesap sahibi",
+			currency: "Para birimi",
+			iban: "IBAN",
+			swift: "SWIFT",
+			report: "Ödemeyi gönderdim",
+			none: "Bu para biriminde tanımlı banka hesabı yok.",
+			active: "Aktif",
+			activate: "Aktif yap",
+			deactivate: "Pasif yap",
+			add: "Hesap ekle",
+			invalidIban: "IBAN geçersiz.",
+		},
+	},
+	en: {
+		bankTransfer: {
+			label: "Bank transfer",
+			nav: "Bank accounts",
+			instructions:
+				"Send the amount to one of the accounts below with your payment number ({reference}) as the reference, then let us know.",
+			bank: "Bank",
+			branch: "Branch",
+			holder: "Account holder",
+			currency: "Currency",
+			iban: "IBAN",
+			swift: "SWIFT",
+			report: "I have sent the payment",
+			none: "No bank account is set up for this currency.",
+			active: "Active",
+			activate: "Activate",
+			deactivate: "Deactivate",
+			add: "Add account",
+			invalidIban: "The IBAN is not valid.",
+		},
+	},
+};
