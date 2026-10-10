@@ -1,20 +1,25 @@
 import type { PluginPageProps } from "@zaydemy/core";
+import { Alert, Button, Card, CardContent, Field, PageHeader, Textarea } from "@zaydemy/ui";
 
 export default function FeedbackPage({ searchParams, t }: PluginPageProps) {
 	return (
 		<main>
-			<h1>{t("feedback.title")}</h1>
+			<PageHeader title={t("feedback.title")} description={t("feedback.intro")} />
 			{searchParams.sent ? (
-				<p role="status">{t("feedback.thanks")}</p>
+				<Alert variant="success">{t("feedback.thanks")}</Alert>
 			) : (
-				<form method="post" action="/api/feedback">
-					<p>{t("feedback.intro")}</p>
-					<label>
-						{t("feedback.message")}
-						<textarea name="message" required maxLength={2000} rows={6} />
-					</label>
-					<button type="submit">{t("feedback.send")}</button>
-				</form>
+				<Card>
+					<CardContent>
+						<form method="post" action="/api/feedback" className="grid gap-4">
+							<Field label={t("feedback.message")} htmlFor="message">
+								<Textarea id="message" name="message" required maxLength={2000} rows={6} />
+							</Field>
+							<div>
+								<Button type="submit">{t("feedback.send")}</Button>
+							</div>
+						</form>
+					</CardContent>
+				</Card>
 			)}
 		</main>
 	);

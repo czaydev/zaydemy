@@ -2,6 +2,7 @@ import "server-only";
 import { matchPage, type PageArea, type PluginPageProps } from "@zaydemy/core";
 import { notFound, redirect } from "next/navigation";
 import type { ComponentType } from "react";
+import { SiteShell } from "@/components/shell/site-shell";
 import { getLocale, getTranslator } from "./i18n";
 import { getPluginSession } from "./session";
 import { getZaydemy, resolvedConfig } from "./zaydemy";
@@ -30,7 +31,7 @@ export async function renderPluginPage(area: PageArea, { params, searchParams }:
 	const { default: Page } = await match.page.load();
 	const Component = Page as ComponentType<PluginPageProps>;
 	const [locale, t] = await Promise.all([getLocale(), getTranslator()]);
-	return (
+	const page = (
 		<Component
 			params={match.params}
 			searchParams={await searchParams}
@@ -39,4 +40,8 @@ export async function renderPluginPage(area: PageArea, { params, searchParams }:
 			t={t}
 		/>
 	);
+	// Admin pages get their frame from app/admin/layout.tsx.
+	if (area === "admin") return page;
+	if (match.page.layout === "bare") return <div className="zd-content">{page}</div>;
+	return <SiteShell width="narrow">{page}</SiteShell>;
 }

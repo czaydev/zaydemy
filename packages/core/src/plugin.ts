@@ -86,7 +86,10 @@ export interface PluginDefinition {
 	/** Drizzle tables owned by the plugin. */
 	schema?: Record<string, unknown>;
 	permissions?: { key: string; name: string }[];
+	/** Entries in the admin sidebar. */
 	adminNav?: NavItem[];
+	/** Entries in the applicant's menu, e.g. "My payments". */
+	appNav?: NavItem[];
 	messages?: Partial<Record<Locale, Messages>>;
 	pages?: PluginPage[];
 	/** HTTP handlers mounted under `/api`. */

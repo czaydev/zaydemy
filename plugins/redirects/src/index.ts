@@ -21,7 +21,7 @@ export const redirectsPlugin = definePlugin({
 	],
 	messages,
 	pages: [
-		{ area: "app", path: "/r/[slug]", load: () => import("./pages/go") },
+		{ area: "app", path: "/r/[slug]", layout: "bare", load: () => import("./pages/go") },
 		{
 			area: "admin",
 			path: "/redirects",

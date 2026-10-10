@@ -6,7 +6,12 @@ export async function PoweredBy() {
 	if (!resolvedConfig.brand.poweredBy) return null;
 	const t = await getTranslator();
 	return (
-		<a href="https://czay.dev" target="_blank" rel="noopener">
+		<a
+			href="https://czay.dev"
+			target="_blank"
+			rel="noopener"
+			className="text-muted-foreground text-xs hover:text-foreground"
+		>
 			{t("common.poweredBy", { name: "czay.dev" })}
 		</a>
 	);

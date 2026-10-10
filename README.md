@@ -46,7 +46,7 @@ Without extra settings, e-mails and SMS are printed to the server console and up
 on when their variables in `.env` are set; see `apps/web/integrations.ts`. Card payments run on
 [better-payment](https://github.com/czaydev/better-payment) with iyzico sandbox keys by default.
 
-To change the brand, the enabled plugins or the stages of each pipeline, edit
+To change the brand (name, logo, colour), the enabled plugins or the stages of each pipeline, edit
 `apps/web/zaydemy.config.ts`.
 
 ## Layout
@@ -58,6 +58,7 @@ packages/core/       plugin API, pipeline engine, config + licence checks
 packages/db/         Drizzle client, core schema, pipeline store
 packages/auth/       better-auth on Drizzle (e-mail/password, one-time codes, Google, roles)
 packages/i18n/       translator; core strings in Turkish and English
+packages/ui/         design tokens and React components shared by the app and plugins
 packages/tsconfig/   shared TypeScript config
 plugins/             community plugins (stages, payment providers, integrations)
 ee/                  commercially licensed plugins
@@ -117,7 +118,8 @@ export const myPlugin = definePlugin({
 	version: "0.1.0",
 	stages: [defineStage({ id: "example", label: "example.stage", onEnter: () => "wait" })],
 	schema: {},       // Drizzle tables owned by the plugin
-	adminNav: [],     // admin menu entries
+	adminNav: [],     // admin sidebar entries: { label, href, icon, permission }
+	appNav: [],       // applicant menu entries, e.g. { label: "example.nav", href: "/examples" }
 	messages: {},     // tr / en translations
 	pages: [          // mounted under /admin/… or at the site root
 		{ area: "admin", path: "/examples/[id]", permission: "examples.manage", load: () => import("./pages/example") },
@@ -137,7 +139,36 @@ export const myPlugin = definePlugin({
 
 Plugin pages are server components and read the database through `runtime()`. Admin pages need the
 listed permission (or any role when none is set); turning a plugin off removes its pages and
-menu entries from the build.
+menu entries from the build. App pages are framed by the site header and footer; pass
+`layout: "bare"` for public pages with their own look, such as `/links`.
+
+### Interface
+
+Pages are built from `@zaydemy/ui`: Tailwind CSS v4 with design tokens, plus server-friendly
+components such as `Button`, `Card`, `Table`, `Field`, `Badge`, `Alert`, `PageHeader`, `EmptyState`
+and `Steps`. The primary colour comes from `brand.theme.primary` in `zaydemy.config.ts`, and the
+rest of the palette (hover, soft backgrounds, focus rings, dark mode) is derived from it.
+
+```ts
+import { Button, Card, CardContent, PageHeader } from "@zaydemy/ui";
+
+export default function ExamplePage({ t }: PluginPageProps) {
+	return (
+		<main>
+			<PageHeader title={t("example.title")} />
+			<Card>
+				<CardContent>
+					<Button>{t("example.save")}</Button>
+				</CardContent>
+			</Card>
+		</main>
+	);
+}
+```
+
+A plugin can also render plain semantic HTML: headings, tables, forms, inputs and buttons without
+a `class` attribute are styled by the theme, so a page still fits in before it uses the components.
+Navigation icons are named (`icon: "wallet"`); see `packages/ui/src/components/icon.tsx`.
 
 See `plugins/stage-interview` for a complete example.
 

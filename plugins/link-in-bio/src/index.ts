@@ -18,7 +18,7 @@ export const linkInBioPlugin = definePlugin({
 	],
 	messages,
 	pages: [
-		{ area: "app", path: "/links", load: () => import("./pages/links") },
+		{ area: "app", path: "/links", layout: "bare", load: () => import("./pages/links") },
 		{
 			area: "admin",
 			path: "/link-in-bio",

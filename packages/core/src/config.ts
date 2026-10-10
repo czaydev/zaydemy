@@ -25,6 +25,12 @@ export interface BrandConfig {
 	/** Used in file names and identifiers. */
 	slug: string;
 	logo?: { full: string; icon: string };
+	/** Colours of the interface. `primary` takes any CSS colour, e.g. "#4f46e5". */
+	theme?: {
+		primary?: string;
+		/** Text on primary-coloured buttons; defaults to white. */
+		primaryForeground?: string;
+	};
 	supportEmail?: string;
 	/** "Powered by czay.dev" attribution. Turning it off needs a white-label licence. */
 	poweredBy?: boolean;
@@ -44,6 +50,7 @@ export interface ResolvedConfig extends Omit<ZaydemyConfig, "license">, ServiceS
 	stages: Map<string, StageDefinition<unknown>>;
 	schema: Record<string, unknown>;
 	adminNav: NavItem[];
+	appNav: NavItem[];
 	permissions: { key: string; name: string }[];
 	pages: PluginPage[];
 	api: PluginApiRoute[];
@@ -182,6 +189,7 @@ export function resolveConfig(
 		stages,
 		schema: Object.assign({}, ...config.plugins.map((p) => p.schema ?? {})),
 		adminNav: config.plugins.flatMap((p) => p.adminNav ?? []),
+		appNav: config.plugins.flatMap((p) => p.appNav ?? []),
 		permissions: config.plugins.flatMap((p) => p.permissions ?? []),
 		pages,
 		api,

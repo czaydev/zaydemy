@@ -52,6 +52,7 @@ export function documentsPlugin({ maxSizeMb = 5 }: DocumentsOptions = {}) {
 		adminNav: [
 			{ label: "documents.nav", href: "/admin/documents", icon: "file-check", permission: REVIEW },
 		],
+		appNav: [{ label: "documents.title", href: "/documents", icon: "file-text" }],
 		messages,
 		pages: [
 			{

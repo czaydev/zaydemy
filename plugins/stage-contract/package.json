@@ -12,14 +12,15 @@
 	"dependencies": {
 		"@zaydemy/core": "workspace:*",
 		"@zaydemy/db": "workspace:*",
+		"@zaydemy/ui": "workspace:*",
 		"drizzle-orm": "^0.45.4",
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {
 		"@types/node": "^22.19.0",
+		"@types/react": "^19.2.0",
 		"@zaydemy/tsconfig": "workspace:*",
-		"typescript": "^5.9.3",
-		"@types/react": "^19.2.0"
+		"typescript": "^5.9.3"
 	},
 	"peerDependencies": {
 		"react": "^19.2.0"

@@ -108,6 +108,7 @@ export function paymentsPlugin({
 		adminNav: [
 			{ label: "payments.nav", href: "/admin/payments", icon: "wallet", permission: MANAGE },
 		],
+		appNav: [{ label: "payments.myPayments", href: "/payments", icon: "wallet" }],
 		messages,
 		pages: [
 			{ area: "app", path: "/payments", signedIn: true, load: () => import("./pages/my-payments") },
