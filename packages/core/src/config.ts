@@ -74,6 +74,21 @@ const SERVICE_LABELS: Record<ServiceName, string> = {
 	errorReporter: "error reporting",
 };
 
+/** Permissions for the admin screens that ship with the core. */
+export const CORE_PERMISSIONS = {
+	viewApplications: "applications.view",
+	manageApplications: "applications.manage",
+	manageCourses: "courses.manage",
+	manageUsers: "users.manage",
+} as const;
+
+const corePermissionNames: Record<string, string> = {
+	[CORE_PERMISSIONS.viewApplications]: "View applications",
+	[CORE_PERMISSIONS.manageApplications]: "Move or reject applications",
+	[CORE_PERMISSIONS.manageCourses]: "Manage courses and categories",
+	[CORE_PERMISSIONS.manageUsers]: "Manage users, roles and permissions",
+};
+
 export class ConfigError extends Error {
 	override name = "ConfigError";
 }
@@ -172,7 +187,7 @@ export function resolveConfig(
 	const messages: Partial<Record<Locale, Messages>> = {};
 	for (const plugin of config.plugins) {
 		for (const [locale, dict] of Object.entries(plugin.messages ?? {}) as [Locale, Messages][]) {
-			messages[locale] = { ...messages[locale], ...dict };
+			messages[locale] = mergeMessages(messages[locale] ?? {}, dict);
 		}
 	}
 
@@ -190,7 +205,10 @@ export function resolveConfig(
 		schema: Object.assign({}, ...config.plugins.map((p) => p.schema ?? {})),
 		adminNav: config.plugins.flatMap((p) => p.adminNav ?? []),
 		appNav: config.plugins.flatMap((p) => p.appNav ?? []),
-		permissions: config.plugins.flatMap((p) => p.permissions ?? []),
+		permissions: [
+			...Object.entries(corePermissionNames).map(([key, name]) => ({ key, name })),
+			...config.plugins.flatMap((p) => p.permissions ?? []),
+		],
 		pages,
 		api,
 		messages,
@@ -207,4 +225,17 @@ export function resolveConfig(
 		hooks: new TransactionHooks(),
 		license,
 	};
+}
+
+/** Deep-merges message trees so plugins can share top-level keys such as `permissions`. */
+function mergeMessages(base: Messages, extra: Messages): Messages {
+	const out: Messages = { ...base };
+	for (const [key, value] of Object.entries(extra)) {
+		const current = out[key];
+		out[key] =
+			typeof value === "object" && typeof current === "object"
+				? mergeMessages(current, value)
+				: value;
+	}
+	return out;
 }

@@ -7,7 +7,10 @@ export const STAGE = "contract";
 
 export const stageOptions = z.object({
 	/** Key of the policy (Settings → Policies) that holds the contract text. */
-	policy: z.string().default("enrollment-contract"),
+	policy: z
+		.string()
+		.default("enrollment-contract")
+		.meta({ label: "contract.options.policy", hint: "contract.options.policyHint" }),
 });
 
 type Db = Zaydemy["db"];

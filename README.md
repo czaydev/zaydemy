@@ -39,7 +39,9 @@ Open http://localhost:3000. The seed creates:
 
 Sign up with any other e-mail to try the applicant side: apply to a course on the home page, then
 follow "Devam et" (continue) for the current step. Sign in as the admin to approve payments, interviews,
-documents and contracts under `/admin`.
+documents and contracts under `/admin`, where you can also search and move applications, create
+courses and set their stage options (amounts, required documents...), and manage users, roles and
+permissions.
 
 Without extra settings, e-mails and SMS are printed to the server console and uploads go to
 `apps/web/storage/`. Card payments, Postmark, Ekomesaj, Bunny Storage, Sentry and Discord each turn
@@ -169,6 +171,27 @@ export default function ExamplePage({ t }: PluginPageProps) {
 A plugin can also render plain semantic HTML: headings, tables, forms, inputs and buttons without
 a `class` attribute are styled by the theme, so a page still fits in before it uses the components.
 Navigation icons are named (`icon: "wallet"`); see `packages/ui/src/components/icon.tsx`.
+
+### Stage options
+
+A stage's `options` schema is also its form on the course page. Give each field a label and hint
+through zod metadata, and the course editor renders and validates it:
+
+```ts
+options: z.object({
+	amount: z.number().int().min(0).meta({ label: "payments.options.amount", format: "money" }),
+	currency: z.string().default("TRY").meta({ label: "payments.options.currency" }),
+}),
+```
+
+Supported fields are numbers (`format: "money"` takes "1.250,50" and stores minor units), strings,
+URLs, string lists (comma separated) and booleans.
+
+### Permissions
+
+Core declares `applications.view`, `applications.manage`, `courses.manage` and `users.manage`;
+plugins add their own through `permissions`. Name them for the roles page with messages under
+`permissions.<namespace>.<action>`.
 
 See `plugins/stage-interview` for a complete example.
 

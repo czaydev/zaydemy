@@ -1,9 +1,14 @@
 export default {
 	tr: {
+		permissions: { documents: { review: "Evrakları incele, evrak türlerini yönet" } },
 		documents: {
 			stage: "Evrak",
 			nav: "Evraklar",
 			typesNav: "Evrak türleri",
+			options: {
+				types: "İstenen evraklar",
+				typesHint: "Evrak türü anahtarları, virgülle. Boş bırakılırsa tüm aktif evraklar istenir.",
+			},
 			title: "Evraklarım",
 			intro: "Başvurunuzun devam edebilmesi için aşağıdaki evrakları yükleyin.",
 			none: "Şu anda sizden istenen bir evrak yok.",
@@ -44,10 +49,15 @@ export default {
 		},
 	},
 	en: {
+		permissions: { documents: { review: "Review documents and manage document types" } },
 		documents: {
 			stage: "Documents",
 			nav: "Documents",
 			typesNav: "Document types",
+			options: {
+				types: "Required documents",
+				typesHint: "Document type keys, comma separated. Empty asks for every active type.",
+			},
 			title: "My documents",
 			intro: "Upload the documents below so your application can continue.",
 			none: "No documents are requested from you right now.",

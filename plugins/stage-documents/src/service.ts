@@ -16,7 +16,10 @@ export const STAGE = "documents";
 
 export const stageOptions = z.object({
 	/** Document type keys this course asks for. Default: every active document type. */
-	types: z.array(z.string()).optional(),
+	types: z
+		.array(z.string())
+		.optional()
+		.meta({ label: "documents.options.types", hint: "documents.options.typesHint" }),
 });
 export type DocumentStageOptions = z.infer<typeof stageOptions>;
 

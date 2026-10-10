@@ -1,8 +1,10 @@
 export default {
 	tr: {
+		permissions: { contracts: { manage: "Sözleşmeleri yönet" } },
 		contract: {
 			stage: "Sözleşme",
 			nav: "Sözleşmeler",
+			options: { policy: "Sözleşme metni", policyHint: "Kullanılacak politika metninin anahtarı." },
 			title: "Kayıt sözleşmesi",
 			none: "Onayınızı bekleyen bir sözleşme yok.",
 			accept: "Okudum, onaylıyorum",
@@ -17,9 +19,11 @@ export default {
 		},
 	},
 	en: {
+		permissions: { contracts: { manage: "Manage contracts" } },
 		contract: {
 			stage: "Contract",
 			nav: "Contracts",
+			options: { policy: "Contract text", policyHint: "Key of the policy that holds the text." },
 			title: "Enrolment contract",
 			none: "No contract is waiting for your approval.",
 			accept: "I have read and accept",

@@ -5,8 +5,12 @@ import { payments } from "./schema";
 
 const options = z.object({
 	/** In minor units. Zero (the default) skips the stage, so free courses need no extra pipeline. */
-	amount: z.number().int().nonnegative().default(0),
-	currency: z.string().length(3).default("TRY"),
+	amount: z.number().int().nonnegative().default(0).meta({
+		label: "payments.options.amount",
+		hint: "payments.options.amountHint",
+		format: "money",
+	}),
+	currency: z.string().length(3).default("TRY").meta({ label: "payments.options.currency" }),
 });
 
 /**

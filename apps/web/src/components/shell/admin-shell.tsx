@@ -1,4 +1,4 @@
-import type { PluginSession } from "@zaydemy/core";
+import { CORE_PERMISSIONS, type PluginSession } from "@zaydemy/core";
 import { Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { PoweredBy } from "@/components/powered-by";
@@ -18,9 +18,29 @@ export async function AdminShell({
 	children: ReactNode;
 }) {
 	const t = await getTranslator();
+	const core = [
+		{
+			label: "applications.title",
+			href: "/admin/applications",
+			icon: "clipboard-list",
+			permission: CORE_PERMISSIONS.viewApplications,
+		},
+		{
+			label: "courses.title",
+			href: "/admin/courses",
+			icon: "graduation-cap",
+			permission: CORE_PERMISSIONS.manageCourses,
+		},
+		{
+			label: "users.title",
+			href: "/admin/users",
+			icon: "users",
+			permission: CORE_PERMISSIONS.manageUsers,
+		},
+	];
 	const links: MenuLink[] = [
 		{ label: t("admin.overview"), href: "/admin", icon: "chart" },
-		...resolvedConfig.adminNav
+		...[...core, ...resolvedConfig.adminNav]
 			.filter((item) => !item.permission || session.permissions.includes(item.permission))
 			.map((item) => ({ ...item, label: t(item.label) })),
 	];

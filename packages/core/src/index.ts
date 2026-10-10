@@ -8,3 +8,4 @@ export * from "./pipeline";
 export * from "./plugin";
 export * from "./routes";
 export * from "./services";
+export * from "./stage-options";

@@ -22,7 +22,10 @@ export const interviewStage = defineStage({
 	label: "interview.stage",
 	options: z.object({
 		/** Booking page applicants use to pick a slot (Cal.com, Calendly, …). */
-		schedulingUrl: z.url().optional(),
+		schedulingUrl: z.url().optional().meta({
+			label: "interview.options.schedulingUrl",
+			hint: "interview.options.schedulingUrlHint",
+		}),
 	}),
 	async onEnter({ db, applicationId }) {
 		await db.insert(interviews).values({ applicationId }).onConflictDoNothing();
