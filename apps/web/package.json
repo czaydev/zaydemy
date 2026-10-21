@@ -19,6 +19,7 @@
 		"@zaydemy/db": "workspace:*",
 		"@zaydemy/i18n": "workspace:*",
 		"@zaydemy/plugin-feedback-discord": "workspace:*",
+		"@zaydemy/plugin-lessons": "workspace:*",
 		"@zaydemy/plugin-link-in-bio": "workspace:*",
 		"@zaydemy/plugin-mail-postmark": "workspace:*",
 		"@zaydemy/plugin-monitoring-sentry": "workspace:*",

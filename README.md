@@ -49,6 +49,14 @@ on when their variables in `.env` are set; see `apps/web/integrations.ts`. Card 
 To change the brand (name, logo, colour), the enabled plugins or the stages of each pipeline, edit
 `apps/web/zaydemy.config.ts`.
 
+### Demo Mode
+
+To run the application in a read-only demo mode where users cannot perform write operations (except for authentication endpoints), set the `DEMO_MODE` environment variable to `true`.
+
+```sh
+DEMO_MODE=true pnpm dev
+```
+
 ## Layout
 
 ```
@@ -93,6 +101,7 @@ breaks applications already in progress.
 | `feedback-discord` | Feedback form posting to a Discord channel |
 | `redirects` | Short links at `/r/<slug>` with click counts |
 | `link-in-bio` | Public `/links` page for social media bios |
+| `lessons` | Manages course content (sections, lessons) with basic views |
 
 Plugins that need credentials are switched on from environment variables in
 `apps/web/integrations.ts`; the rest are listed in `apps/web/zaydemy.config.ts`. After enabling a

@@ -1,0 +1,8 @@
+{
+	"extends": "@zaydemy/tsconfig/base.json",
+	"compilerOptions": {
+		"outDir": "dist",
+		"jsx": "react-jsx"
+	},
+	"include": ["src"]
+}

@@ -1,4 +1,5 @@
 import { defineConfig, type PluginDefinition } from "@zaydemy/core";
+import { lessonsPlugin } from "@zaydemy/plugin-lessons";
 import { notificationsPlugin } from "@zaydemy/plugin-notifications";
 import { bankTransferPlugin } from "@zaydemy/plugin-payment-bank-transfer";
 import { paymentsPlugin } from "@zaydemy/plugin-payments";
@@ -27,6 +28,7 @@ export default defineConfig({
 		interviewPlugin,
 		documentsPlugin({ maxSizeMb: 5 }),
 		contractPlugin,
+		lessonsPlugin,
 
 		// Ways to pay. Card payments (better-payment) are in integrations.ts.
 		bankTransferPlugin,

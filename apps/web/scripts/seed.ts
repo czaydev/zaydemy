@@ -1,18 +1,8 @@
-/**
- * Fills a fresh database with what a local install needs: an admin role that
- * holds every permission the enabled plugins declare, an admin account, and a
- * small demo catalogue. Safe to run more than once.
- *
- *   pnpm db:seed
- *
- * ADMIN_EMAIL / ADMIN_PASSWORD pick the admin account. Without a password a
- * random one is generated and printed. An existing user with that e-mail is
- * made admin as is.
- */
 import { randomBytes } from "node:crypto";
 import { createAuth } from "@zaydemy/auth";
 import { resolveConfig } from "@zaydemy/core";
 import { createDatabase, schema } from "@zaydemy/db";
+import { lessons, sections } from "@zaydemy/plugin-lessons/schema";
 import { bankAccounts } from "@zaydemy/plugin-payment-bank-transfer/schema";
 import { documentTypes } from "@zaydemy/plugin-stage-documents/schema";
 import { eq, inArray } from "drizzle-orm";
@@ -28,43 +18,42 @@ const adminEmail = env("ADMIN_EMAIL", "admin@example.com");
 const adminPassword = process.env.ADMIN_PASSWORD || randomBytes(12).toString("base64url");
 
 function must<T>(row: T | undefined, what: string): T {
-	if (!row) throw new Error(`Seed could not find ${what}.`);
+	if (!row) throw new Error(`Missing ${what}`);
 	return row;
 }
 
 const resolved = resolveConfig(config);
 const db = createDatabase(env("DATABASE_URL"), resolved.schema);
-const enabled = new Set(resolved.plugins.map((p) => p.id));
 
 async function seedAccess() {
+	const [role] = await db
+		.insert(schema.roles)
+		.values({ key: "admin", name: "Yönetici" })
+		.onConflictDoUpdate({ target: schema.roles.key, set: { name: "Yönetici" } })
+		.returning({ id: schema.roles.id });
+
 	const declared = resolved.permissions;
 	if (declared.length > 0) {
 		await db.insert(schema.permissions).values(declared).onConflictDoNothing();
+		const rows = await db
+			.select({ id: schema.permissions.id })
+			.from(schema.permissions)
+			.where(
+				inArray(
+					schema.permissions.key,
+					declared.map((p) => p.key),
+				),
+			);
+		const mappedRows = rows.map((p) => {
+			const roleId = role?.id;
+			if (!roleId) throw new Error("Role ID is missing");
+			return { roleId, permissionId: p.id };
+		});
+		await db.insert(schema.rolePermissions).values(mappedRows).onConflictDoNothing();
 	}
-	await db.insert(schema.roles).values({ key: "admin", name: "Admin" }).onConflictDoNothing();
-	const role = must(
-		(await db.select().from(schema.roles).where(eq(schema.roles.key, "admin")))[0],
-		"the admin role",
-	);
-	const rows =
-		declared.length === 0
-			? []
-			: await db
-					.select({ id: schema.permissions.id })
-					.from(schema.permissions)
-					.where(
-						inArray(
-							schema.permissions.key,
-							declared.map((p) => p.key),
-						),
-					);
-	if (rows.length > 0) {
-		await db
-			.insert(schema.rolePermissions)
-			.values(rows.map((p) => ({ roleId: role.id, permissionId: p.id })))
-			.onConflictDoNothing();
-	}
-	return role;
+	const roleId = role?.id;
+	if (!roleId) throw new Error("Role ID is missing");
+	return { id: roleId };
 }
 
 async function seedAdmin(roleId: string) {
@@ -90,31 +79,30 @@ async function seedAdmin(roleId: string) {
 }
 
 async function seedCatalogue() {
-	await db
+	const enabled = new Set(resolved.plugins.map((p) => p.id));
+	const [category] = await db
 		.insert(schema.courseCategories)
 		.values({ name: "Yazılım", slug: "software" })
-		.onConflictDoNothing();
-	const category = must(
-		(
-			await db
-				.select()
-				.from(schema.courseCategories)
-				.where(eq(schema.courseCategories.slug, "software"))
-		)[0],
-		"the demo category",
-	);
-	await db
+		.onConflictDoUpdate({ target: schema.courseCategories.slug, set: { name: "Yazılım" } })
+		.returning({ id: schema.courseCategories.id });
+
+	const categoryId = category?.id;
+	if (!categoryId) throw new Error("Category ID is missing");
+
+	const coursesData = await db
 		.insert(schema.courses)
 		.values([
 			{
-				name: "Full Stack Bootcamp",
-				slug: "full-stack-bootcamp",
-				description: "Ön ödeme, mülakat, belge, sözleşme ve eğitim ücreti adımlarıyla.",
-				categoryId: category.id,
-				deliveryModes: ["in_person", "online"],
+				name: "Web Geliştirme Bootcamp",
+				slug: "web-bootcamp",
+				description: "Tüm aşamaları kullanan örnek eğitim.",
+				categoryId: categoryId,
+				deliveryModes: ["in_person"],
+				pipeline: "default",
 				stageOptions: {
-					prepayment: { amount: 50_000 },
-					documents: { types: ["id-card"] },
+					prepayment: { amount: 15_000 },
+					documents: { require: ["id-card"] },
+					contract: { contentId: "enrollment-contract" },
 					tuition: { amount: 1_500_000 },
 				},
 			},
@@ -122,12 +110,21 @@ async function seedCatalogue() {
 				name: "Git'e Giriş",
 				slug: "intro-to-git",
 				description: "Ücretsiz eğitim: başvuru doğrudan kayda dönüşür.",
-				categoryId: category.id,
+				categoryId: categoryId,
 				deliveryModes: ["online"],
 				pipeline: "free",
 			},
 		])
-		.onConflictDoNothing();
+		.onConflictDoNothing()
+		.returning({ id: schema.courses.id, slug: schema.courses.slug });
+
+	let gitCourseId = coursesData.find((c) => c.slug === "intro-to-git")?.id;
+	if (!gitCourseId) {
+		gitCourseId = (
+			await db.select().from(schema.courses).where(eq(schema.courses.slug, "intro-to-git"))
+		)[0]?.id;
+	}
+
 	await db
 		.insert(schema.terms)
 		.values({ number: 1, name: "2026 Güz", isActive: true })
@@ -157,6 +154,34 @@ async function seedCatalogue() {
 				iban: "TR330006100519786457841326",
 			})
 			.onConflictDoNothing();
+	}
+
+	if (enabled.has("lessons") && gitCourseId) {
+		const [section1] = await db
+			.insert(sections)
+			.values({
+				courseId: gitCourseId,
+				title: "1. Modül: Git Temelleri",
+				order: 1,
+			})
+			.onConflictDoNothing()
+			.returning({ id: sections.id });
+
+		let secId = section1?.id;
+		if (!secId) {
+			secId = (await db.select().from(sections).where(eq(sections.courseId, gitCourseId)))[0]?.id;
+		}
+
+		if (secId) {
+			await db
+				.insert(lessons)
+				.values([
+					{ sectionId: secId, title: "Versiyon Kontrolü Nedir?", order: 1, isPublished: true },
+					{ sectionId: secId, title: "Git Kurulumu", order: 2, isPublished: true },
+					{ sectionId: secId, title: "İlk Commit", order: 3, isPublished: false },
+				])
+				.onConflictDoNothing();
+		}
 	}
 }
 
