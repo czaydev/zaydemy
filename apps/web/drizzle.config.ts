@@ -14,6 +14,7 @@ const pluginSchemas = [
 	"../../plugins/payment-bank-transfer/src/schema.ts",
 	"../../plugins/stage-documents/src/schema.ts",
 	"../../plugins/redirects/src/schema.ts",
+	"../../plugins/lessons/src/schema.ts",
 ];
 
 export default defineConfig({
