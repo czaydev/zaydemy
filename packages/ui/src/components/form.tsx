@@ -36,6 +36,24 @@ export function Checkbox({ className, ...props }: Omit<ComponentProps<"input">, 
 	);
 }
 
+/** A checkbox with its label text; children are the label. */
+export function CheckboxField({
+	children,
+	className,
+	...props
+}: Omit<ComponentProps<"input">, "type" | "children"> & { children: ReactNode }) {
+	return (
+		<label className={cn("flex items-start gap-2 text-sm", className)}>
+			<input
+				type="checkbox"
+				className="mt-0.5 size-4 shrink-0 rounded border-input accent-primary"
+				{...props}
+			/>
+			<span>{children}</span>
+		</label>
+	);
+}
+
 export function Label({ className, ...props }: ComponentProps<"label">) {
 	// biome-ignore lint/a11y/noLabelWithoutControl: the control is passed by the caller
 	return <label className={cn("font-medium text-sm leading-none", className)} {...props} />;
@@ -58,7 +76,7 @@ export function Field({
 	children: ReactNode;
 }) {
 	return (
-		<div className={cn("grid gap-2", className)}>
+		<div className={cn("grid content-start gap-2", className)}>
 			<Label htmlFor={htmlFor}>{label}</Label>
 			{children}
 			{error ? (

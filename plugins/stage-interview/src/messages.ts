@@ -1,9 +1,14 @@
 export default {
 	tr: {
+		permissions: { interviews: { manage: "Mülakatları yönet" } },
 		interview: {
 			stage: "Mülakat",
 			nav: "Mülakatlar",
 			title: "Mülakatlar",
+			options: {
+				schedulingUrl: "Randevu bağlantısı",
+				schedulingUrlHint: "Başvuranın mülakat saati seçeceği sayfa (Cal.com, Calendly…).",
+			},
 			empty: "Henüz mülakat yok.",
 			application: "Başvuru",
 			applicant: "Başvuran",
@@ -24,10 +29,15 @@ export default {
 		},
 	},
 	en: {
+		permissions: { interviews: { manage: "Manage interviews" } },
 		interview: {
 			stage: "Interview",
 			nav: "Interviews",
 			title: "Interviews",
+			options: {
+				schedulingUrl: "Booking link",
+				schedulingUrlHint: "Page where applicants pick an interview slot (Cal.com, Calendly…).",
+			},
 			empty: "No interviews yet.",
 			application: "Application",
 			applicant: "Applicant",

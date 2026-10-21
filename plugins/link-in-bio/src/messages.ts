@@ -1,5 +1,6 @@
 export default {
 	tr: {
+		permissions: { "link-in-bio": { manage: "Link-in-bio sayfasını düzenle" } },
 		linkInBio: {
 			nav: "Link-in-bio",
 			empty: "Bu sayfa henüz hazırlanmadı.",
@@ -13,6 +14,7 @@ export default {
 		},
 	},
 	en: {
+		permissions: { "link-in-bio": { manage: "Edit the link-in-bio page" } },
 		linkInBio: {
 			nav: "Link in bio",
 			empty: "This page is not set up yet.",

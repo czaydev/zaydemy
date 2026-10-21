@@ -1,5 +1,6 @@
 export default {
 	tr: {
+		permissions: { redirects: { manage: "Yönlendirmeleri yönet" } },
 		redirects: {
 			nav: "Yönlendirmeler",
 			redirecting: "Yönlendiriliyorsunuz…",
@@ -25,6 +26,7 @@ export default {
 		},
 	},
 	en: {
+		permissions: { redirects: { manage: "Manage redirects" } },
 		redirects: {
 			nav: "Redirects",
 			redirecting: "Redirecting…",

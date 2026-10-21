@@ -1,5 +1,6 @@
 export default {
 	tr: {
+		permissions: { "bank-accounts": { manage: "Banka hesaplarını yönet" } },
 		bankTransfer: {
 			label: "Havale / EFT",
 			nav: "Banka hesapları",
@@ -21,6 +22,7 @@ export default {
 		},
 	},
 	en: {
+		permissions: { "bank-accounts": { manage: "Manage bank accounts" } },
 		bankTransfer: {
 			label: "Bank transfer",
 			nav: "Bank accounts",

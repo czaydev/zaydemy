@@ -1,9 +1,15 @@
 export default {
 	tr: {
+		permissions: { payments: { manage: "Ödemeleri yönet" } },
 		payments: {
 			nav: "Ödemeler",
 			title: "Ödeme",
 			myPayments: "Ödemelerim",
+			options: {
+				amount: "Tutar",
+				amountHint: "0 girilirse bu adım atlanır.",
+				currency: "Para birimi",
+			},
 			amount: "Tutar",
 			reference: "Ödeme no",
 			payer: "Ödeyen",
@@ -55,10 +61,16 @@ export default {
 		},
 	},
 	en: {
+		permissions: { payments: { manage: "Manage payments" } },
 		payments: {
 			nav: "Payments",
 			title: "Payment",
 			myPayments: "My payments",
+			options: {
+				amount: "Amount",
+				amountHint: "Zero skips this step.",
+				currency: "Currency",
+			},
 			amount: "Amount",
 			reference: "Payment no",
 			payer: "Payer",

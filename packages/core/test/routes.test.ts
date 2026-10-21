@@ -53,6 +53,24 @@ describe("resolveConfig plugins", () => {
 	};
 	const mailer = { send: async () => {} };
 
+	it("deep-merges plugin messages that share a top-level key", () => {
+		const a = definePlugin({
+			id: "a",
+			name: "A",
+			version: "0",
+			messages: { tr: { permissions: { a: { manage: "A yönet" } } } },
+		});
+		const b = definePlugin({
+			id: "b",
+			name: "B",
+			version: "0",
+			messages: { tr: { permissions: { b: { manage: "B yönet" } } } },
+		});
+		expect(resolveConfig({ ...base, plugins: [a, b] }).messages.tr).toEqual({
+			permissions: { a: { manage: "A yönet" }, b: { manage: "B yönet" } },
+		});
+	});
+
 	it("refuses two mail plugins", () => {
 		const a = definePlugin({ id: "a", name: "A", version: "0", mailer });
 		const b = definePlugin({ id: "b", name: "B", version: "0", mailer });

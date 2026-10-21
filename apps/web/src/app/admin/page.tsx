@@ -112,7 +112,12 @@ export default async function AdminHomePage() {
 									return (
 										<li key={row.stage} className="grid gap-1.5">
 											<div className="flex items-center justify-between text-sm">
-												<span>{stage ? t(stage.label) : row.stage}</span>
+												<a
+													href={`/admin/applications?stage=${row.stage}`}
+													className="hover:underline"
+												>
+													{stage ? t(stage.label) : row.stage}
+												</a>
 												<span className="font-medium tabular-nums">{number.format(row.value)}</span>
 											</div>
 											<div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -149,9 +154,14 @@ export default async function AdminHomePage() {
 										? resolvedConfig.stages.get(row.currentStage)
 										: undefined;
 									return (
-										<TableRow key={row.id}>
+										<TableRow key={row.id} className="relative">
 											<TableCell>
-												<p className="font-medium">{row.applicant}</p>
+												<a
+													href={`/admin/applications/${row.id}`}
+													className="font-medium after:absolute after:inset-0 hover:underline"
+												>
+													{row.applicant}
+												</a>
 												<p className="text-muted-foreground text-xs">{row.email}</p>
 											</TableCell>
 											<TableCell>
