@@ -1,8 +1,19 @@
 import { type PluginPageProps, runtime } from "@zaydemy/core";
 import { schema as coreSchema } from "@zaydemy/db";
-import { Card, CardContent, PageHeader } from "@zaydemy/ui";
+import {
+	Button,
+	Card,
+	CardContent,
+	PageHeader,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@zaydemy/ui";
 import { and, asc, eq } from "drizzle-orm";
-import { lessons, sections } from "../schema";
+import { lessonAttachments, lessons, sections } from "../schema";
 
 export default async function MyLessonsPage({ t, session, searchParams }: PluginPageProps) {
 	const { db } = runtime();
@@ -25,11 +36,13 @@ export default async function MyLessonsPage({ t, session, searchParams }: Plugin
 	const selectedCourseId =
 		typeof searchParams.courseId === "string" ? searchParams.courseId : enrolledCourses[0]?.id;
 
+	const selectedLessonId = typeof searchParams.lessonId === "string" ? searchParams.lessonId : null;
+
 	let courseSections: {
 		id: string;
 		title: string;
 		order: number;
-		lessons: { id: string; title: string; order: number }[];
+		lessons: { id: string; title: string; order: number; body: string | null }[];
 	}[] = [];
 
 	if (selectedCourseId && enrolledCourses.some((c) => c.id === selectedCourseId)) {
@@ -48,6 +61,28 @@ export default async function MyLessonsPage({ t, session, searchParams }: Plugin
 			...section,
 			lessons: dbLessons.filter((lesson) => lesson.sectionId === section.id),
 		}));
+	}
+
+	let activeLesson = null;
+	let attachments: {
+		id: string;
+		name: string;
+		size: number;
+		fileKey: string;
+		lessonId: string;
+		type: string;
+		createdAt: Date;
+	}[] = [];
+	if (selectedLessonId) {
+		const foundLesson = await db.select().from(lessons).where(eq(lessons.id, selectedLessonId));
+		if (foundLesson[0]?.isPublished) {
+			activeLesson = foundLesson[0];
+			attachments = await db
+				.select()
+				.from(lessonAttachments)
+				.where(eq(lessonAttachments.lessonId, selectedLessonId))
+				.orderBy(asc(lessonAttachments.createdAt));
+		}
 	}
 
 	return (
@@ -69,9 +104,76 @@ export default async function MyLessonsPage({ t, session, searchParams }: Plugin
 							</a>
 						))
 					)}
+
+					{selectedCourseId && courseSections.length > 0 && (
+						<div className="mt-4 pt-4 border-t">
+							<h4 className="font-semibold text-sm mb-2 text-muted-foreground">Course Content</h4>
+							{courseSections.map((section) => (
+								<div key={section.id} className="mb-4">
+									<div className="font-medium text-sm mb-1">{section.title}</div>
+									<div className="flex flex-col gap-1 pl-2 border-l-2">
+										{section.lessons.map((lesson) => (
+											<a
+												key={lesson.id}
+												href={`?courseId=${selectedCourseId}&lessonId=${lesson.id}`}
+												className={`text-sm py-1 px-2 rounded hover:bg-muted/50 ${selectedLessonId === lesson.id ? "font-semibold bg-muted" : "text-muted-foreground"}`}
+											>
+												{lesson.title}
+											</a>
+										))}
+									</div>
+								</div>
+							))}
+						</div>
+					)}
 				</div>
 				<div className="lg:col-span-3 grid gap-6">
-					{selectedCourseId && courseSections.length > 0 ? (
+					{activeLesson ? (
+						<div className="space-y-8">
+							<Card>
+								<CardContent className="p-8 prose dark:prose-invert max-w-none">
+									<h1>{activeLesson.title}</h1>
+									{/* Using dangerouslySetInnerHTML carefully for LMS content */}
+									<div
+										// biome-ignore lint/security/noDangerouslySetInnerHtml: LMS course content
+										dangerouslySetInnerHTML={{ __html: activeLesson.body || "No content." }}
+									/>
+								</CardContent>
+							</Card>
+
+							{attachments.length > 0 && (
+								<Card>
+									<CardContent className="p-6">
+										<h3 className="font-semibold text-lg mb-4">Attachments</h3>
+										<Table>
+											<TableHeader>
+												<TableRow>
+													<TableHead>File</TableHead>
+													<TableHead>Size</TableHead>
+													<TableHead className="text-right">Action</TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{attachments.map((att) => (
+													<TableRow key={att.id}>
+														<TableCell className="font-medium">{att.name}</TableCell>
+														<TableCell className="text-muted-foreground">
+															{Math.round(att.size / 1024)} KB
+														</TableCell>
+														<TableCell className="text-right">
+															<Button variant="outline" size="sm">
+																Download
+															</Button>
+														</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</Table>
+									</CardContent>
+								</Card>
+							)}
+						</div>
+					) : selectedCourseId && courseSections.length > 0 ? (
 						courseSections.map((section) => (
 							<div key={section.id}>
 								<h4 className="font-semibold text-lg mb-3">{section.title}</h4>
@@ -81,7 +183,15 @@ export default async function MyLessonsPage({ t, session, searchParams }: Plugin
 											key={lesson.id}
 											className="hover:bg-muted/50 cursor-pointer transition-colors"
 										>
-											<CardContent className="p-4">{lesson.title}</CardContent>
+											<CardContent className="p-4 flex justify-between items-center">
+												{lesson.title}
+												<a
+													href={`?courseId=${selectedCourseId}&lessonId=${lesson.id}`}
+													className="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-muted h-9 px-3 border"
+												>
+													Start
+												</a>
+											</CardContent>
 										</Card>
 									))}
 								</div>
