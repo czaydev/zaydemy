@@ -61,7 +61,9 @@ export default async function AdminHomePage() {
 			.limit(8),
 	]);
 
-	const statusCount = (status: string) => byStatus.find((r) => r.status === status)?.value ?? 0;
+	// Precomputed for O(1) lookups during render to avoid O(n²) bottleneck
+	const statusCounts = new Map(byStatus.map((r) => [r.status, r.value]));
+	const statusCount = (status: string) => statusCounts.get(status) ?? 0;
 	const total = byStatus.reduce((sum, r) => sum + r.value, 0);
 	const waiting = byStage.filter((r) => r.stage);
 	const maxWaiting = Math.max(1, ...waiting.map((r) => r.value));

@@ -87,11 +87,21 @@ async function loadApplications(userId: string) {
 							applications.map((a) => a.id),
 						),
 					);
+
+	// Precomputed for O(1) lookups during render to avoid O(n²) bottleneck
+	const stagesMap = new Map<string, Map<string, string>>();
+	for (const s of stages) {
+		let appStages = stagesMap.get(s.applicationId);
+		if (!appStages) {
+			appStages = new Map();
+			stagesMap.set(s.applicationId, appStages);
+		}
+		appStages.set(s.stage, s.status);
+	}
+
 	return applications.map((application) => ({
 		...application,
-		stageStatus: new Map(
-			stages.filter((s) => s.applicationId === application.id).map((s) => [s.stage, s.status]),
-		),
+		stageStatus: stagesMap.get(application.id) ?? new Map(),
 	}));
 }
 
@@ -117,9 +127,13 @@ export default async function HomePage({
 					.then((rows) => rows[0])
 			: undefined,
 	]);
-	const appliedCourses = new Set(
-		applications.filter((a) => a.status === "in_progress").map((a) => a.courseId),
-	);
+	// Precomputed for O(1) lookups during render to avoid O(n²) bottleneck
+	const appliedCourses = new Set<string>();
+	for (const a of applications) {
+		if (a.status === "in_progress") {
+			appliedCourses.add(a.courseId);
+		}
+	}
 	const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 
 	const courseList = (

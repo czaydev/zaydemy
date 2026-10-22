@@ -62,6 +62,15 @@ export default async function AdminUsersPage({
 						.where(inArray(schema.applications.userId, ids))
 						.groupBy(schema.applications.userId),
 				]);
+	// Precomputed for O(1) lookups during render to avoid O(n²) bottleneck
+	const userRolesMap = new Map<string, { userId: string; name: string }[]>();
+	for (const role of roles) {
+		const arr = userRolesMap.get(role.userId) ?? [];
+		arr.push(role);
+		userRolesMap.set(role.userId, arr);
+	}
+	const applicationCounts = new Map(applications.map((a) => [a.userId, a.value]));
+
 	const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 
 	return (
@@ -121,15 +130,13 @@ export default async function AdminUsersPage({
 								</TableCell>
 								<TableCell>
 									<div className="flex flex-wrap gap-1">
-										{roles
-											.filter((r) => r.userId === user.id)
-											.map((r) => (
-												<Badge key={r.name}>{r.name}</Badge>
-											))}
+										{(userRolesMap.get(user.id) ?? []).map((r) => (
+											<Badge key={r.name}>{r.name}</Badge>
+										))}
 									</div>
 								</TableCell>
 								<TableCell className="text-right tabular-nums">
-									{applications.find((a) => a.userId === user.id)?.value ?? 0}
+									{applicationCounts.get(user.id) ?? 0}
 								</TableCell>
 								<TableCell className="whitespace-nowrap text-right text-muted-foreground">
 									{date.format(user.createdAt)}
