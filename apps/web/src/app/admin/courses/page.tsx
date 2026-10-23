@@ -55,7 +55,10 @@ export default async function AdminCoursesPage({
 			.groupBy(schema.applications.courseId),
 		db.select().from(schema.courseCategories).orderBy(schema.courseCategories.name),
 	]);
-	const applicationCount = (id: string) => applications.find((a) => a.courseId === id)?.value ?? 0;
+
+	// ⚡ Bolt Optimization: Replace O(n²) array lookup with O(n) Map creation for O(1) lookups in render loop
+	const applicationCountMap = new Map(applications.map((a) => [a.courseId, a.value]));
+	const applicationCount = (id: string) => applicationCountMap.get(id) ?? 0;
 
 	return (
 		<main className="grid gap-8">

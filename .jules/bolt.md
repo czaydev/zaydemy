@@ -1,0 +1,3 @@
+## 2024-05-24 - O(n²) array lookups inside React render loops
+**Learning:** Found a performance anti-pattern where `.find()` and `.filter()` are used on arrays returned from the database inside React `.map()` render loops for relational data. This creates O(n²) time complexity.
+**Action:** When mapping relational data arrays to other elements inside a list render, first convert the related arrays into a `Map` or a `Record` object indexed by the join key to ensure O(1) lookups inside the render loop.
