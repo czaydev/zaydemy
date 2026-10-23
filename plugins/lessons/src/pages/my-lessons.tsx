@@ -13,6 +13,7 @@ import {
 	TableRow,
 } from "@zaydemy/ui";
 import { and, asc, eq } from "drizzle-orm";
+import sanitizeHtml from "sanitize-html";
 import { lessonAttachments, lessons, sections } from "../schema";
 export default async function MyLessonsPage({ t, session, searchParams }: PluginPageProps) {
 	const { db } = runtime();
@@ -130,10 +131,12 @@ export default async function MyLessonsPage({ t, session, searchParams }: Plugin
 							<Card>
 								<CardContent className="p-8 prose dark:prose-invert max-w-none">
 									<h1>{activeLesson.title}</h1>
-									{/* Using dangerouslySetInnerHTML carefully for LMS content */}
+									{/* Sanitizing LMS content to prevent XSS */}
 									<div
-										// biome-ignore lint/security/noDangerouslySetInnerHtml: LMS course content
-										dangerouslySetInnerHTML={{ __html: activeLesson.body || "No content." }}
+										// biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized LMS course content
+										dangerouslySetInnerHTML={{
+											__html: activeLesson.body ? sanitizeHtml(activeLesson.body) : "No content.",
+										}}
 									/>
 								</CardContent>
 							</Card>

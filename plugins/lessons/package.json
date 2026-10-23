@@ -11,10 +11,12 @@
 		"typecheck": "tsc"
 	},
 	"dependencies": {
+		"@types/sanitize-html": "^2.16.2",
 		"@zaydemy/core": "workspace:*",
 		"@zaydemy/db": "workspace:*",
 		"@zaydemy/ui": "workspace:*",
-		"drizzle-orm": "^0.45.4"
+		"drizzle-orm": "^0.45.4",
+		"sanitize-html": "^2.18.1"
 	},
 	"devDependencies": {
 		"@types/node": "^22.19.0",
