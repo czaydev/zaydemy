@@ -1,15 +1,16 @@
 import { schema } from "@zaydemy/db";
 import { lessonsPlugin } from "@zaydemy/plugin-lessons";
+import { interviewPlugin } from "@zaydemy/plugin-stage-interview";
 import { localFileStorage } from "@zaydemy/plugin-storage-local";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { apply, seed, setup, testUrl } from "./helpers";
 
 describe.skipIf(!testUrl)("lessons integration", () => {
-	it("should allow only enrolled users to view lessons", async () => {
+	it("keeps pending and enrolled course applications separate", async () => {
 		const t = setup({
-			plugins: [localFileStorage(), lessonsPlugin],
-			pipelines: { default: [] },
+			plugins: [localFileStorage(), interviewPlugin, lessonsPlugin],
+			pipelines: { default: ["interview"] },
 		});
 
 		const ctx = await seed(t);
