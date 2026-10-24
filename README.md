@@ -13,7 +13,7 @@ Any Postgres 16 works too; set `DATABASE_URL` to it and skip step 2.
 # 1. Install dependencies
 pnpm install
 
-# 2. Start Postgres on localhost:5432
+# 2. Start Postgres on localhost:5433
 docker compose up -d
 
 # 3. Configure the app

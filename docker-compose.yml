@@ -1,20 +1,19 @@
 # Local Postgres for development only: `docker compose up -d`.
-# It trusts every connection, so keep it bound to localhost.
 services:
   postgres:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: zaydemy
       POSTGRES_DB: zaydemy
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-dev-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       retries: 10
 
 volumes:
-  postgres-data:
+  postgres-dev-data:
