@@ -52,6 +52,7 @@ export function UserMenu({
 		<div ref={ref} className="relative">
 			<button
 				type="button"
+				aria-label={name}
 				aria-expanded={open}
 				aria-haspopup="menu"
 				onClick={() => setOpen(!open)}

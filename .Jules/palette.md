@@ -1,1 +1,4 @@
+## 2024-10-24 - Missing ARIA labels on avatar menus
+**Learning:** Found an accessibility issue where the Avatar user menu button had no `aria-label`, making it confusing for screen readers since the name was often visually hidden on mobile.
+**Action:** Always verify that interactive elements containing only avatars or icons have proper `aria-label`s describing their purpose or the user they represent.
 ## 2023-10-23 - Added Focus Visible to Shared Button Component\n**Learning:** The base button component in `packages/ui` was lacking visual focus indicators for keyboard users. Other inputs used `ring-3`, so this was added to match.\n**Action:** Applied standard focus-visible classes (`focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring`) directly to the base `buttonVariants` via cva in `packages/ui/src/components/button.tsx`, ensuring accessibility cascades across the app.
