@@ -1,5 +1,6 @@
 import { schema } from "@zaydemy/db";
 import { lessonsPlugin } from "@zaydemy/plugin-lessons";
+import { localFileStorage } from "@zaydemy/plugin-storage-local";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { apply, seed, setup, testUrl } from "./helpers";
@@ -7,7 +8,7 @@ import { apply, seed, setup, testUrl } from "./helpers";
 describe.skipIf(!testUrl)("lessons integration", () => {
 	it("should allow only enrolled users to view lessons", async () => {
 		const t = setup({
-			plugins: [lessonsPlugin],
+			plugins: [localFileStorage(), lessonsPlugin],
 			pipelines: { default: [] },
 		});
 
