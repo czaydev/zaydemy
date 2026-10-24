@@ -54,7 +54,6 @@ export function UserMenu({
 				type="button"
 				aria-expanded={open}
 				aria-haspopup="menu"
-				aria-label="User menu"
 				onClick={() => setOpen(!open)}
 				className="flex cursor-pointer items-center gap-2 rounded-full p-0.5 pr-2 hover:bg-muted"
 			>
