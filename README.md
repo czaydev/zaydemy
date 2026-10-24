@@ -60,6 +60,17 @@ To run the application in a read-only demo mode where users cannot perform write
 DEMO_MODE=true pnpm dev
 ```
 
+### Course content
+
+Staff with the `lessons.manage` permission can select a course at `/admin/lessons`, add sections
+and lessons, and edit their order, publication status and opening date. Lower order numbers appear
+first. New content starts as a draft; publish both the section and the lesson to make it available.
+Opening dates are entered in UTC. A blank date means content opens as soon as it is published.
+
+Learners see their enrolled courses at `/lessons`. Drafts and future content stay hidden, including
+when opening a lesson or downloading a file through a direct URL. An active application that has
+not reached `enrolled` does not grant lesson access.
+
 ## Layout
 
 ```

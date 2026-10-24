@@ -10,6 +10,8 @@ export const sections = pgTable("course_sections", {
 		.references(() => schema.courses.id, { onDelete: "cascade" }),
 	title: text("title").notNull(),
 	order: integer("order").notNull().default(0),
+	isPublished: boolean("is_published").notNull().default(true),
+	openAt: timestamp("open_at"),
 });
 
 export const lessons = pgTable("course_lessons", {
