@@ -87,11 +87,17 @@ async function loadApplications(userId: string) {
 							applications.map((a) => a.id),
 						),
 					);
+
+	const stagesByApp = new Map<string, [string, string][]>();
+	for (const s of stages) {
+		const list = stagesByApp.get(s.applicationId) ?? [];
+		list.push([s.stage, s.status]);
+		stagesByApp.set(s.applicationId, list);
+	}
+
 	return applications.map((application) => ({
 		...application,
-		stageStatus: new Map(
-			stages.filter((s) => s.applicationId === application.id).map((s) => [s.stage, s.status]),
-		),
+		stageStatus: new Map(stagesByApp.get(application.id) ?? []),
 	}));
 }
 
