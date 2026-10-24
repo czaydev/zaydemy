@@ -13,12 +13,13 @@ Any Postgres 16 works too; set `DATABASE_URL` to it and skip step 2.
 # 1. Install dependencies
 pnpm install
 
-# 2. Start Postgres on localhost:5432
-docker compose up -d
-
-# 3. Configure the app
+# 2. Configure the app
 cp apps/web/.env.example apps/web/.env
+#    set POSTGRES_PASSWORD and the matching password in DATABASE_URL
 #    then set BETTER_AUTH_SECRET in apps/web/.env, e.g. to the output of `openssl rand -base64 32`
+
+# 3. Start Postgres on localhost:5433 (use docker-compose if installed separately)
+docker compose --env-file apps/web/.env up -d
 
 # 4. Create the tables and the demo data
 pnpm db:migrate
