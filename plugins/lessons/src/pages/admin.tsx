@@ -1,260 +1,368 @@
-import { type PluginPageProps, runtime } from "@zaydemy/core";
-import { schema as coreSchema } from "@zaydemy/db";
+import { type PluginPageProps, runtime, type Translate } from "@zaydemy/core";
+import { schema } from "@zaydemy/db";
 import {
+	Alert,
 	Badge,
 	Button,
+	ButtonLink,
 	Card,
 	CardContent,
+	CardHeader,
+	CardTitle,
+	CheckboxField,
+	Field,
 	Input,
 	PageHeader,
+	Select,
 	Table,
 	TableBody,
 	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
+	Textarea,
 } from "@zaydemy/ui";
 import { asc, eq } from "drizzle-orm";
-import { lessonAttachments, lessons, sections } from "../schema";
-export default async function AdminLessonsPage({ t, searchParams }: PluginPageProps) {
-	const { db } = runtime();
-	const courses = await db.select().from(coreSchema.courses);
+import { adminHref } from "../index";
+import { lessonAttachments } from "../schema";
+import { courseContent } from "../service";
 
+function ContentFields({
+	t,
+	prefix,
+	value,
+}: {
+	t: Translate;
+	prefix: string;
+	value?: { title: string; order: number; isPublished: boolean; openAt: Date | null };
+}) {
+	return (
+		<>
+			<Field label={t("lessons.fields.title")} htmlFor={`${prefix}-title`}>
+				<Input
+					id={`${prefix}-title`}
+					name="title"
+					maxLength={200}
+					defaultValue={value?.title}
+					required
+				/>
+			</Field>
+			<Field
+				label={t("lessons.fields.order")}
+				htmlFor={`${prefix}-order`}
+				hint={t("lessons.orderHint")}
+			>
+				<Input
+					id={`${prefix}-order`}
+					name="order"
+					type="number"
+					min={0}
+					max={2147483647}
+					step={1}
+					defaultValue={value?.order ?? 0}
+					required
+				/>
+			</Field>
+			<Field
+				label={t("lessons.fields.openAt")}
+				htmlFor={`${prefix}-openAt`}
+				hint={t("lessons.openAtHint")}
+			>
+				<Input
+					id={`${prefix}-openAt`}
+					name="openAt"
+					type="datetime-local"
+					defaultValue={value?.openAt?.toISOString().slice(0, 16) ?? ""}
+				/>
+			</Field>
+			<CheckboxField name="isPublished" defaultChecked={value?.isPublished ?? false}>
+				{t("lessons.fields.published")}
+			</CheckboxField>
+		</>
+	);
+}
+
+export default async function AdminLessonsPage({ t, session, searchParams }: PluginPageProps) {
+	if (!session?.permissions.includes("lessons.manage")) return null;
+	const { db } = runtime();
+	const courses = await db
+		.select({ id: schema.courses.id, name: schema.courses.name })
+		.from(schema.courses)
+		.orderBy(asc(schema.courses.name));
 	const selectedCourseId =
 		typeof searchParams.courseId === "string" ? searchParams.courseId : courses[0]?.id;
-
-	let courseSections: {
-		id: string;
-		title: string;
-		order: number;
-		lessons: {
-			id: string;
-			title: string;
-			order: number;
-			isPublished: boolean;
-			body: string | null;
-		}[];
-	}[] = [];
-
-	if (selectedCourseId) {
-		const dbSections = await db
-			.select()
-			.from(sections)
-			.where(eq(sections.courseId, selectedCourseId))
-			.orderBy(asc(sections.order));
-		const dbLessons = await db.select().from(lessons).orderBy(asc(lessons.order));
-
-		courseSections = dbSections.map((section) => ({
-			...section,
-			lessons: dbLessons.filter((lesson) => lesson.sectionId === section.id),
-		}));
-	}
-
-	const editLessonId = searchParams.editLessonId as string | undefined;
+	const course = courses.find((row) => row.id === selectedCourseId);
+	const content = course ? await courseContent(db, course.id) : [];
+	const editLessonId =
+		typeof searchParams.editLessonId === "string" ? searchParams.editLessonId : undefined;
+	const lesson = content
+		.flatMap((section) => section.lessons)
+		.find((row) => row.id === editLessonId);
+	const error = typeof searchParams.error === "string" ? searchParams.error : undefined;
+	const notice = error ? (
+		<Alert variant="destructive">
+			{t(error === "file" ? "lessons.errors.file" : "lessons.errors.invalid")}
+		</Alert>
+	) : null;
 
 	if (editLessonId) {
-		const lessonResult = await db.select().from(lessons).where(eq(lessons.id, editLessonId));
-		const lesson = lessonResult[0];
-
-		if (!lesson) {
+		if (!course || !lesson)
 			return (
 				<main>
-					<PageHeader title="Lesson not found" />
+					<PageHeader
+						title={t("lessons.notFound")}
+						back={{ href: "/admin/lessons", label: t("lessons.title") }}
+					/>
 				</main>
 			);
-		}
-
 		const attachments = await db
 			.select()
 			.from(lessonAttachments)
-			.where(eq(lessonAttachments.lessonId, editLessonId))
-			.orderBy(asc(lessonAttachments.createdAt));
-
+			.where(eq(lessonAttachments.lessonId, lesson.id))
+			.orderBy(asc(lessonAttachments.createdAt), asc(lessonAttachments.id));
 		return (
-			<main className="grid gap-6 max-w-7xl mx-auto w-full">
-				<PageHeader title={`Edit Lesson: ${lesson.title}`} />
-				<form method="POST" action={`/api/lessons/${lesson.id}/update`}>
-					<section className="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 shadow-sm mb-6">
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<div className="space-y-1.5">
-								<label className="block font-semibold" htmlFor="lesson-title">
-									Lesson Title
-								</label>
-								<Input id="lesson-title" name="title" defaultValue={lesson.title} required />
-							</div>
-							<div className="space-y-1.5">
-								<label className="block font-semibold" htmlFor="lesson-order">
-									Display Order
-								</label>
-								<Input
-									id="lesson-order"
-									name="order"
-									type="number"
-									defaultValue={lesson.order.toString()}
-									required
-								/>
-							</div>
-							<div className="space-y-1.5 col-span-2">
-								<label className="block font-semibold" htmlFor="lesson-body">
-									Lesson Content (Markdown)
-								</label>
-								<textarea
+			<main className="grid gap-6">
+				<PageHeader
+					title={t("lessons.editLesson")}
+					description={lesson.title}
+					back={{ href: adminHref(course.id), label: course.name }}
+				/>
+				{notice}
+				<Card>
+					<CardContent>
+						<form
+							method="post"
+							action={`/api/lessons/${lesson.id}/update`}
+							className="grid gap-4 sm:grid-cols-2"
+						>
+							<ContentFields t={t} prefix="lesson" value={lesson} />
+							<Field
+								label={t("lessons.section")}
+								htmlFor="lesson-section"
+								className="sm:col-span-2"
+							>
+								<Select id="lesson-section" name="sectionId" defaultValue={lesson.sectionId}>
+									{content.map((section) => (
+										<option key={section.id} value={section.id}>
+											{section.title}
+										</option>
+									))}
+								</Select>
+							</Field>
+							<Field
+								label={t("lessons.fields.body")}
+								htmlFor="lesson-body"
+								className="sm:col-span-2"
+							>
+								<Textarea
 									id="lesson-body"
 									name="body"
-									defaultValue={lesson.body || ""}
-									className="w-full h-64 p-3 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-mono text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-outline"
-								></textarea>
+									rows={16}
+									maxLength={1_000_000}
+									defaultValue={lesson.body ?? ""}
+									className="font-mono"
+								/>
+							</Field>
+							<div className="flex gap-2 sm:col-span-2">
+								<Button type="submit">{t("lessons.save")}</Button>
+								<ButtonLink href={adminHref(course.id)} variant="outline">
+									{t("lessons.cancel")}
+								</ButtonLink>
 							</div>
-						</div>
-						<div className="mt-4 pt-4 border-t flex justify-end gap-2">
-							<Button variant="outline" type="button">
-								Discard
-							</Button>
-							<Button type="submit">Save Changes</Button>
-						</div>
-					</section>
-				</form>
-
-				<section className="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 shadow-sm space-y-4">
-					<h2 className="font-semibold text-lg">Attachments</h2>
-					<form
-						method="POST"
-						action={`/api/lessons/${lesson.id}/attachments`}
-						encType="multipart/form-data"
-					>
-						<div className="flex gap-2 mb-4 items-center">
-							<Input type="file" name="file" className="max-w-md" required />
-							<Button type="submit">Upload</Button>
-						</div>
-					</form>
-					{attachments.length > 0 ? (
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>File Name</TableHead>
-									<TableHead>Size (bytes)</TableHead>
-									<TableHead>Type</TableHead>
-									<TableHead className="text-right">Actions</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{attachments.map((att) => (
-									<TableRow key={att.id}>
-										<TableCell>{att.name}</TableCell>
-										<TableCell>{att.size}</TableCell>
-										<TableCell>{att.type}</TableCell>
-										<TableCell className="text-right">
-											<form
-												method="POST"
-												action={`/api/lessons/${lesson.id}/attachments/${att.id}/delete`}
-											>
-												<Button variant="destructive" size="sm" type="submit">
-													Delete
-												</Button>
-											</form>
-										</TableCell>
+						</form>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader>
+						<CardTitle>{t("lessons.attachments")}</CardTitle>
+					</CardHeader>
+					<CardContent className="grid gap-4">
+						<form
+							method="post"
+							action={`/api/lessons/${lesson.id}/attachments`}
+							encType="multipart/form-data"
+							className="flex flex-wrap items-end gap-3"
+						>
+							<Field label={t("lessons.file")} htmlFor="attachment">
+								<Input id="attachment" type="file" name="file" required />
+							</Field>
+							<Button type="submit">{t("lessons.upload")}</Button>
+						</form>
+						{attachments.length ? (
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>{t("lessons.file")}</TableHead>
+										<TableHead>{t("lessons.size")}</TableHead>
+										<TableHead>{t("lessons.actions")}</TableHead>
 									</TableRow>
-								))}
-							</TableBody>
-						</Table>
-					) : (
-						<div className="text-muted-foreground text-sm">No attachments yet.</div>
-					)}
-				</section>
+								</TableHeader>
+								<TableBody>
+									{attachments.map((attachment) => (
+										<TableRow key={attachment.id}>
+											<TableCell>{attachment.name}</TableCell>
+											<TableCell>{attachment.size.toLocaleString()} B</TableCell>
+											<TableCell>
+												<form
+													method="post"
+													action={`/api/lessons/${lesson.id}/attachments/${attachment.id}/delete`}
+												>
+													<Button type="submit" size="sm" variant="destructive">
+														{t("lessons.remove")}
+													</Button>
+												</form>
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						) : (
+							<p className="text-muted-foreground text-sm">{t("lessons.noAttachments")}</p>
+						)}
+					</CardContent>
+				</Card>
 			</main>
 		);
 	}
+
 	return (
 		<main className="grid gap-6">
 			<PageHeader title={t("lessons.title")} />
-			<div className="grid gap-4 lg:grid-cols-4">
-				<div className="flex flex-col gap-2">
-					<h3 className="font-semibold mb-2">Courses</h3>
-					{courses.map((course) => (
-						<a
-							key={course.id}
-							href={`?courseId=${course.id}`}
-							className={`block p-3 rounded-lg border ${selectedCourseId === course.id ? "bg-muted" : "hover:bg-muted/50"}`}
-						>
-							{course.name}
-						</a>
-					))}
-				</div>
-				<div className="lg:col-span-3 grid gap-6">
-					{selectedCourseId ? (
-						<div className="flex flex-col gap-4">
-							<div className="flex justify-end">
-								<Button size="sm">Add Section</Button>
-							</div>
-							{courseSections.length === 0 ? (
-								<Card>
-									<CardContent className="p-8 text-center text-muted-foreground">
-										No sections or lessons found.
-									</CardContent>
-								</Card>
-							) : (
-								courseSections.map((section) => (
-									<Card key={section.id}>
-										<CardContent className="p-0">
-											<div className="bg-muted p-4 border-b font-medium flex justify-between items-center">
-												{section.title}
-												<div className="flex gap-2">
-													<Button variant="outline" size="sm">
-														Edit Section
-													</Button>
-													<Button variant="secondary" size="sm">
-														Add Lesson
-													</Button>
-												</div>
-											</div>
-											{section.lessons.length > 0 ? (
-												<Table>
-													<TableHeader>
-														<TableRow>
-															<TableHead>Lesson</TableHead>
-															<TableHead>Status</TableHead>
-															<TableHead className="text-right">Actions</TableHead>
-														</TableRow>
-													</TableHeader>
-													<TableBody>
-														{section.lessons.map((lesson) => (
-															<TableRow key={lesson.id}>
-																<TableCell>{lesson.title}</TableCell>
-																<TableCell>
-																	<Badge variant={lesson.isPublished ? "success" : "secondary"}>
-																		{lesson.isPublished ? "Published" : "Draft"}
-																	</Badge>
-																</TableCell>
-																<TableCell className="text-right">
-																	<div className="flex justify-end gap-2">
-																		<a
-																			href={`?courseId=${selectedCourseId}&editLessonId=${lesson.id}`}
-																			className="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-muted h-9 px-3"
-																		>
-																			Edit
-																		</a>
-																		<Button variant="ghost" size="sm">
-																			Delete
-																		</Button>
-																	</div>
-																</TableCell>
-															</TableRow>
-														))}
-													</TableBody>
-												</Table>
-											) : (
-												<div className="p-4 text-sm text-muted-foreground">
-													No lessons in this section.
-												</div>
-											)}
-										</CardContent>
-									</Card>
-								))
-							)}
-						</div>
+			{notice}
+			<form method="get" action="/admin/lessons" className="flex flex-wrap items-end gap-3">
+				<Field label={t("lessons.course")} htmlFor="course">
+					<Select id="course" name="courseId" defaultValue={course?.id}>
+						{courses.map((row) => (
+							<option key={row.id} value={row.id}>
+								{row.name}
+							</option>
+						))}
+					</Select>
+				</Field>
+				<Button type="submit" disabled={!courses.length}>
+					{t("lessons.view")}
+				</Button>
+			</form>
+			{!course ? (
+				<p className="text-muted-foreground">{t("lessons.noCourses")}</p>
+			) : (
+				<>
+					<Card>
+						<CardHeader>
+							<CardTitle>{t("lessons.addSection")}</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<form
+								method="post"
+								action="/api/lessons/sections"
+								className="grid gap-4 sm:grid-cols-2"
+							>
+								<input type="hidden" name="courseId" value={course.id} />
+								<ContentFields t={t} prefix="new-section" />
+								<div className="sm:col-span-2">
+									<Button type="submit">{t("lessons.addSection")}</Button>
+								</div>
+							</form>
+						</CardContent>
+					</Card>
+					{!content.length ? (
+						<p className="text-muted-foreground">{t("lessons.noContent")}</p>
 					) : null}
-				</div>
-			</div>
+					{content.map((section) => (
+						<Card key={section.id}>
+							<CardHeader>
+								<CardTitle>{section.title}</CardTitle>
+							</CardHeader>
+							<CardContent className="grid gap-5">
+								<details>
+									<summary className="cursor-pointer font-medium text-sm">
+										{t("lessons.editSection")}
+									</summary>
+									<form
+										method="post"
+										action={`/api/lessons/sections/${section.id}/update`}
+										className="mt-4 grid gap-4 sm:grid-cols-2"
+									>
+										<ContentFields t={t} prefix={section.id} value={section} />
+										<div className="sm:col-span-2">
+											<Button type="submit">{t("lessons.save")}</Button>
+										</div>
+									</form>
+								</details>
+								<div className="flex flex-wrap gap-2 text-sm">
+									<Badge variant={section.isPublished ? "success" : "secondary"}>
+										{t(section.isPublished ? "lessons.published" : "lessons.draft")}
+									</Badge>
+									{section.openAt ? (
+										<span>
+											{t("lessons.opensAt", {
+												date: `${section.openAt.toISOString().slice(0, 16).replace("T", " ")} UTC`,
+											})}
+										</span>
+									) : null}
+								</div>
+								{section.lessons.length ? (
+									<Table>
+										<TableHeader>
+											<TableRow>
+												<TableHead>{t("lessons.fields.order")}</TableHead>
+												<TableHead>{t("lessons.lesson")}</TableHead>
+												<TableHead>{t("lessons.status")}</TableHead>
+												<TableHead>{t("lessons.fields.openAt")}</TableHead>
+												<TableHead>{t("lessons.actions")}</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
+											{section.lessons.map((row) => (
+												<TableRow key={row.id}>
+													<TableCell>{row.order}</TableCell>
+													<TableCell>{row.title}</TableCell>
+													<TableCell>
+														<Badge variant={row.isPublished ? "success" : "secondary"}>
+															{t(row.isPublished ? "lessons.published" : "lessons.draft")}
+														</Badge>
+													</TableCell>
+													<TableCell>
+														{row.openAt
+															? `${row.openAt.toISOString().slice(0, 16).replace("T", " ")} UTC`
+															: t("lessons.immediate")}
+													</TableCell>
+													<TableCell>
+														<ButtonLink
+															href={adminHref(course.id, row.id)}
+															variant="outline"
+															size="sm"
+														>
+															{t("lessons.editLesson")}
+														</ButtonLink>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								) : (
+									<p className="text-muted-foreground text-sm">{t("lessons.noLessons")}</p>
+								)}
+								<details>
+									<summary className="cursor-pointer font-medium text-sm">
+										{t("lessons.addLesson")}
+									</summary>
+									<form
+										method="post"
+										action={`/api/lessons/sections/${section.id}/lessons`}
+										className="mt-4 grid gap-4 sm:grid-cols-2"
+									>
+										<ContentFields t={t} prefix={`new-${section.id}`} />
+										<div className="sm:col-span-2">
+											<Button type="submit">{t("lessons.addLesson")}</Button>
+										</div>
+									</form>
+								</details>
+							</CardContent>
+						</Card>
+					))}
+				</>
+			)}
 		</main>
 	);
 }
